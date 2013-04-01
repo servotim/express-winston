@@ -97,6 +97,10 @@ function errorLogger(options) {
         var exceptionMeta = winston.exception.getAllInfo(err);
         exceptionMeta.req = filterObject(req, requestWhitelist, options.requestFilter);
 
+        if (options.requestCallback) {
+            options.requestCallback(req, exceptionMeta);
+        }
+            
         // This is fire and forget, we don't want logging to hold up the request so don't wait for the callback
         for(var i = 0; i < options.transports.length; i++) {
             var transport = options.transports[i];
@@ -157,6 +161,10 @@ function logger(options) {
                 meta.req.body = filterObject(req.body, bodyWhitelist, options.requestFilter);
             };
 
+            if (options.requestCallback) {
+                options.requestCallback(req, meta);
+            }
+            
             meta.responseTime = responseTime;
 
             var msg = util.format("HTTP %s %s", req.method, req.url);
